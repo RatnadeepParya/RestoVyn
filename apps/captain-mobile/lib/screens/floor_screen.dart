@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/table_model.dart';
+import './order_screen.dart';
 
 class FloorScreen extends StatefulWidget {
   const FloorScreen({super.key});
@@ -123,8 +124,10 @@ class _FloorScreenState extends State<FloorScreen> with SingleTickerProviderStat
 
         return InkWell(
           onTap: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Selected ${table.tableNumber} - Tap to Take Order / Send KOT')),
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => CaptainOrderScreen(tableNumber: table.tableNumber),
+              ),
             );
           },
           borderRadius: BorderRadius.circular(16),

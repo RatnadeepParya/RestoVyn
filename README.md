@@ -1,7 +1,7 @@
 # RestoVyn — Enterprise Restaurant POS & Management Platform
 
 [![CI Pipeline](https://github.com/RatnadeepParya/RestoVyn/actions/workflows/ci.yml/badge.svg)](https://github.com/RatnadeepParya/RestoVyn/actions/workflows/ci.yml)
-[![License: UNLICENSED](https://img.shields.io/badge/License-UNLICENSED-red.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 RestoVyn is a production-grade, internal restaurant operations and Point of Sale (POS) operating platform designed for a single restaurant with future multi-branch scalability.
 
