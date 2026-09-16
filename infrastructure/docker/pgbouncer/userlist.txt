@@ -1,0 +1,2 @@
+"restovyn" "resto_secret_pass"
+"restovyn_readonly" "readonly_pass_123"

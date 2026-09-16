@@ -1,0 +1,104 @@
+# Default values for RestoVyn Helm deployment
+global:
+  environment: production
+  domain: restovyn.internal
+
+api:
+  replicaCount: 2
+  image:
+    repository: restovyn/api
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 4000
+  resources:
+    limits:
+      cpu: 1500m
+      memory: 1024Mi
+    requests:
+      cpu: 300m
+      memory: 512Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 8
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+adminWeb:
+  replicaCount: 2
+  image:
+    repository: restovyn/admin-web
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 3000
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+
+postgres:
+  enabled: true
+  image:
+    repository: postgres
+    tag: "16-alpine"
+  persistence:
+    size: 20Gi
+    storageClass: ""
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 2048Mi
+    requests:
+      cpu: 500m
+      memory: 1024Mi
+
+redis:
+  enabled: true
+  image:
+    repository: redis
+    tag: "7-alpine"
+  persistence:
+    size: 10Gi
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/websocket-services: "api"
+  hosts:
+    - host: pos.restovyn.internal
+      paths:
+        - path: /api
+          pathType: Prefix
+          serviceName: api
+          servicePort: 4000
+        - path: /socket.io
+          pathType: Prefix
+          serviceName: api
+          servicePort: 4000
+    - host: admin.restovyn.internal
+      paths:
+        - path: /
+          pathType: Prefix
+          serviceName: admin-web
+          servicePort: 3000
+  tls:
+    - secretName: restovyn-tls-cert
+      hosts:
+        - pos.restovyn.internal
+        - admin.restovyn.internal

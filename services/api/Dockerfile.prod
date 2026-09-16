@@ -1,0 +1,54 @@
+# =====================================================================
+# RestoVyn Backend API — Hardened Production Dockerfile
+# Multi-stage build with non-root security context and dumb-init
+# =====================================================================
+
+# Stage 1: Dependency resolution and base environment
+FROM node:20-alpine AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+# Stage 2: Compilation and building
+FROM base AS builder
+RUN apk update && apk add --no-cache libc6-compat openssl
+WORKDIR /app
+
+COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml turbo.json ./
+COPY packages/ ./packages/
+COPY prisma/ ./prisma/
+COPY services/api/ ./services/api/
+
+RUN pnpm install --frozen-lockfile || pnpm install
+RUN pnpm --filter @restovyn/api db:generate
+RUN pnpm --filter @restovyn/types build
+RUN pnpm --filter @restovyn/validation build
+RUN pnpm --filter @restovyn/business-rules build
+RUN pnpm --filter @restovyn/api build
+
+# Stage 3: Hardened Production Runtime
+FROM node:20-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV PORT=4000
+
+# Install dumb-init for PID 1 signal proxying and curl for healthcheck
+RUN apk update && apk add --no-cache openssl curl dumb-init
+
+# Copy built application and workspace dependencies
+COPY --from=builder /app /app
+
+# Ensure non-root permissions
+RUN chown -R node:node /app
+USER node
+
+EXPOSE 4000
+
+# Native container healthcheck
+HEALTHCHECK --interval=15s --timeout=5s --start-period=20s --retries=3 \
+  CMD curl -f http://localhost:4000/api/health/live || exit 1
+
+# dumb-init handles SIGTERM and SIGINT to allow graceful database draining
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+CMD ["node", "services/api/dist/main"]

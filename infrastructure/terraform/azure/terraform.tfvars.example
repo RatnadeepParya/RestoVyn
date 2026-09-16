@@ -1,0 +1,4 @@
+azure_location        = "centralindia"
+environment           = "production"
+restaurant_identifier = "restovyn"
+db_password           = "ReplaceWithStrongGeneratedPassword2026!"

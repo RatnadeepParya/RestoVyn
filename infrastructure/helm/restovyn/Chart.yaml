@@ -1,0 +1,16 @@
+apiVersion: v2
+name: restovyn
+description: Enterprise Restaurant Operations & POS Management Helm Chart
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+maintainers:
+  - name: Ratnadeep Parya
+    email: ratnadeep@restovyn.internal
+keywords:
+  - restaurant
+  - pos
+  - point-of-sale
+  - hospitality
+  - nestjs
+  - nextjs

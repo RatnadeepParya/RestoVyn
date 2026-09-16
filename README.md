@@ -111,3 +111,50 @@ pnpm typecheck   # Type-check TypeScript in all workspaces
 pnpm test        # Run unit tests (billing, split-bill, cash formulas)
 pnpm build       # Turbo build all packages and applications
 ```
+
+---
+
+## 7. Enterprise Infrastructure Suite
+
+RestoVyn provides an enterprise-grade, multi-topology infrastructure suite designed for high availability in the cloud and autonomous resilience on local restaurant hardware.
+
+### Production Multi-Container Topology (`docker-compose.prod.yml`)
+
+- **PgBouncer Connection Pooling**: Transaction-level pooling scaling up to 1,000+ concurrent POS and Captain tablet connections.
+- **Hardened PostgreSQL 16**: Tuned for high-transaction SSD operations (`shared_buffers=512MB`, `work_mem=16MB`, autovacuum optimizations).
+- **Redis 7 Enterprise**: AOF append-only persistence with `volatile-lru` eviction policy.
+- **NGINX High-Performance Gateway**: HTTP/2, TLS 1.3, rate-limiting zones (API & brute-force PIN protection), WebSocket (`/socket.io/`) proxying, Brotli/Gzip.
+- **Multi-Stage Dockerfiles**: Unprivileged `node` user with `dumb-init` signal handling and built-in healthchecks (`Dockerfile.prod`).
+
+```bash
+# Launch full production stack with PgBouncer, Redis, API, Web & NGINX
+docker compose -f docker-compose.prod.yml up -d
+```
+
+### Kubernetes & Helm (`infrastructure/k8s` & `infrastructure/helm`)
+
+- **Cloud-Native Kubernetes**: StatefulSets, Deployments, Horizontal Pod Autoscaler (HPA), Pod Disruption Budgets (PDB), and Zero-Trust NetworkPolicies.
+- **Turnkey Helm Chart**: Production chart installable on EKS, GKE, AKS, or local K3s/Rancher clusters:
+  ```bash
+  helm install restovyn ./infrastructure/helm/restovyn -n restovyn-system --create-namespace
+  ```
+
+### Full-Stack Observability (`infrastructure/monitoring`)
+
+- **Prometheus & Alertmanager**: Pre-configured scrape jobs and critical alert rules for P99 latency breaches, elevated 5xx error rates, PgBouncer pool saturation, and disk capacity.
+- **Grafana Dashboard**: Turnkey real-time POS dashboard monitoring throughput (RPS), active tables, KOT dispatch rate, and DB pool stats:
+  ```bash
+  docker compose -f infrastructure/monitoring/docker-compose.monitoring.yml up -d
+  ```
+
+### Multi-Cloud Infrastructure as Code (`infrastructure/terraform`)
+
+- **AWS**: Multi-AZ VPC, ECS Fargate, RDS PostgreSQL Multi-AZ, ElastiCache Redis, S3 bucket with Glacier lifecycle, AWS WAF v2.
+- **GCP**: Regional VPC, Cloud SQL PostgreSQL HA, Memorystore Redis, Cloud Storage, Cloud Armor.
+- **Azure**: VNet, Azure Container Apps, PostgreSQL Flexible Server HA, Azure Cache for Redis, Azure Blob Storage.
+
+### On-Premise Restaurant Edge Appliance & Automated Backups
+
+- **Autonomous Edge Appliance (`infrastructure/edge/edge-setup.sh`)**: Transforms an on-premise Intel NUC or Mini PC into a 24/7 restaurant server with mDNS LAN resolution (`http://restovyn.local`) and static thermal printer routing (port 9100).
+- **Automated Database Backup Daemon (`scripts/backup-db.sh`)**: Nightly compressed `pg_dump` with SHA256 verification, GPG symmetric encryption, 30-day retention pruning, and offsite sync to AWS S3 or GCP GCS.
+- **Disaster Recovery Runbook (`docs/disaster-recovery.md`)**: Validated restoration (`scripts/restore-db.sh`) with RTO < 15 minutes and RPO < 5 minutes.

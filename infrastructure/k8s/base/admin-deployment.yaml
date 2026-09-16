@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: admin-web
+  namespace: restovyn-system
+  labels:
+    app.kubernetes.io/name: admin-web
+    app.kubernetes.io/part-of: restovyn-platform
+spec:
+  ports:
+    - port: 3000
+      targetPort: 3000
+      name: http
+  selector:
+    app: admin-web
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: admin-web
+  namespace: restovyn-system
+  labels:
+    app.kubernetes.io/name: admin-web
+    app.kubernetes.io/part-of: restovyn-platform
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: admin-web
+  template:
+    metadata:
+      labels:
+        app: admin-web
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+        - name: admin-web
+          image: restovyn/admin-web:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+              name: http
+          envFrom:
+            - configMapRef:
+                name: restovyn-config
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "1000m"
+              memory: "512Mi"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 20
+            periodSeconds: 15

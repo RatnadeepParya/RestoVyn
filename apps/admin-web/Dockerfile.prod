@@ -1,0 +1,47 @@
+# =====================================================================
+# RestoVyn Admin Web Panel — Hardened Production Dockerfile
+# Multi-stage Next.js production build with non-root security
+# =====================================================================
+
+# Stage 1: Base setup
+FROM node:20-alpine AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+# Stage 2: Build stage
+FROM base AS builder
+RUN apk update && apk add --no-cache libc6-compat
+WORKDIR /app
+
+COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml turbo.json ./
+COPY packages/ ./packages/
+COPY apps/admin-web/ ./apps/admin-web/
+
+RUN pnpm install --frozen-lockfile || pnpm install
+RUN pnpm --filter @restovyn/types build
+RUN pnpm --filter @restovyn/validation build
+RUN pnpm --filter @restovyn/business-rules build
+RUN pnpm --filter @restovyn/admin-web build
+
+# Stage 3: Production Runner
+FROM node:20-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV PORT=3000
+
+RUN apk update && apk add --no-cache curl dumb-init
+
+COPY --from=builder /app /app
+
+RUN chown -R node:node /app
+USER node
+
+EXPOSE 3000
+
+HEALTHCHECK --interval=20s --timeout=5s --start-period=30s --retries=3 \
+  CMD curl -f http://localhost:3000/api/health || curl -f http://localhost:3000/ || exit 1
+
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+CMD ["pnpm", "--filter", "@restovyn/admin-web", "start"]

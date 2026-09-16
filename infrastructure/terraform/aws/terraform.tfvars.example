@@ -1,0 +1,5 @@
+aws_region            = "ap-south-1"
+environment           = "production"
+restaurant_identifier = "restovyn-flagship"
+db_password           = "ReplaceWithStrongGeneratedPassword2026!"
+jwt_secret            = "ReplaceWithMin32CharactersSuperSecureJWTKey123!"

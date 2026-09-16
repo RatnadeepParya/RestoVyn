@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: "RestoVyn Dashboards"
+    orgId: 1
+    folder: "RestoVyn Operations"
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /var/lib/grafana/dashboards

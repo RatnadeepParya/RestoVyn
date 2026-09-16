@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "restovyn.fullname" . }}-admin-web
+  labels:
+    {{- include "restovyn.labels" . | nindent 4 }}
+    app.kubernetes.io/component: admin-web
+spec:
+  replicas: {{ .Values.adminWeb.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "restovyn.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: admin-web
+  template:
+    metadata:
+      labels:
+        {{- include "restovyn.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: admin-web
+    spec:
+      containers:
+        - name: admin-web
+          image: "{{ .Values.adminWeb.image.repository }}:{{ .Values.adminWeb.image.tag }}"
+          imagePullPolicy: {{ .Values.adminWeb.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.adminWeb.service.port }}
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.adminWeb.resources | nindent 12 }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 15
