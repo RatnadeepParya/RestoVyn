@@ -1,0 +1,30 @@
+name: Development Task
+description: Track development tasks or implementation phases for RestoVyn
+title: "[TASK]: "
+labels: ["task"]
+body:
+  - type: input
+    id: phase
+    attributes:
+      label: Implementation Phase
+      placeholder: e.g. Phase 1 - Foundation, Phase 3 - POS
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Task Scope & Requirements
+      description: Detailed list of requirements and files to be touched.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Definition of Done / Acceptance Criteria
+      description: What checks, tests, or validations confirm completion.
+      placeholder: |
+        - [ ] Unit tests pass
+        - [ ] API endpoints verified
+        - [ ] UI integration tested
+    validations:
+      required: true

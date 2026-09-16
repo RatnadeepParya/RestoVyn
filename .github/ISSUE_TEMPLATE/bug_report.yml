@@ -1,0 +1,57 @@
+name: Bug Report
+description: Report an issue or unexpected behavior in RestoVyn
+title: "[BUG]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report for RestoVyn!
+  - type: dropdown
+    id: component
+    attributes:
+      label: Affected Component
+      options:
+        - Desktop POS (Electron)
+        - Admin Web Panel (Next.js)
+        - Captain App (Flutter)
+        - Backend API (NestJS)
+        - Database (Prisma/Postgres)
+        - Offline Sync Engine
+        - Billing & Tax Engine
+        - Kitchen Display System (KDS)
+        - Hardware / Printers
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Step-by-step instructions to reproduce the behavior.
+      placeholder: |
+        1. Go to POS screen
+        2. Add item 'Chicken Biryani'
+        3. Attempt split payment
+        4. See error...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What should have happened according to business logic.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Logs or Screenshots
+      description: Paste any server error logs, network responses, or error dialogs.
+      render: shell

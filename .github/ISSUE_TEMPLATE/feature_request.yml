@@ -1,0 +1,38 @@
+name: Feature Request
+description: Propose a new feature or enhancement for RestoVyn
+title: "[FEATURE]: "
+labels: ["enhancement"]
+body:
+  - type: dropdown
+    id: component
+    attributes:
+      label: Target Component
+      options:
+        - Desktop POS (Electron)
+        - Admin Web Panel (Next.js)
+        - Captain App (Flutter)
+        - Backend API (NestJS)
+        - Reporting & Analytics
+        - Inventory & Recipes
+        - Finance & Cash Drawer
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or Operational Need
+      description: Is your feature request related to a specific restaurant workflow or pain point?
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution / Workflow
+      description: Describe the ideal user interaction, state transitions, and expected outcome.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternative Solutions Considered
+      description: Any workaround or alternative designs evaluated.
